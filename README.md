@@ -5,12 +5,13 @@ Getting my hands dirty with a full movie sight with react
 
 <hr>
 
+<table>
 <ul>
-  <li>Features of App</li>
-  <tr>
-  <thead>What too look out for</thead>
+  <h2>Features of App</h2>
+  <li>What too look out for</li>
   <td>Home Page</td>
   <td>Search Bar</td>
   <td>Grid View</td>
   </tr>
 </ul>
+</table>
