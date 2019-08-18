@@ -12,6 +12,7 @@ Getting my hands dirty with a full movie sight with react
   <td>Home Page</td>
   <td>Search Bar</td>
   <td>Grid View</td>
+  <td>Load More Button</td>
   </tr>
 </ul>
 </table>
