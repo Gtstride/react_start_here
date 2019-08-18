@@ -1,8 +1,8 @@
 import React from 'react';
 import './FourColGrid.css';
 
-const FourColGrid = (props) => {
-
+const FourColGrid = (props) => { 
+  
   const renderElements = () => {
     const gridElements = props.children.map( (element, i) => {
       return (
@@ -18,7 +18,7 @@ const FourColGrid = (props) => {
     <div className="rmdb-grid">
       {props.header && !props.loading ? <h1>{props.header}</h1> : null}
       <div className="rmdb-grid-content">
-        {renderElements()}
+        {renderElements()} 
       </div>
     </div>
   )

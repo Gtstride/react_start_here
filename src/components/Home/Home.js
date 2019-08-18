@@ -7,6 +7,7 @@ import MovieThumb from '../elements/MovieThumb/MovieThumb';
 import LoadMoreBtn from '../elements/LoadMoreBtn/LoadMoreBtn'; 
 import Spinner from '../elements/Spinner/Spinner';
 import './Home.css';
+import { thisExpression } from '@babel/types';
 
 class Home extends Component {
   state = {
@@ -81,7 +82,22 @@ class Home extends Component {
             <SearchBar callback={this.searchItems} />
          </div> : null }
         
-         <FourColGrid />
+         <div className="rmdb-home-grid">
+            <FourColGrid
+              header={this.state.searchTerm ? 'Search Rwesult' : 'Popular Movies'}
+              loading={this.state.loading}
+            >
+              {this.state.movies.map ( (element, i) => {
+                return <MovieThumb
+                        key={1}
+                        clickable={ true }
+                        image={element.poster_psth ? `${IMAGE_BASE_URL}${POSTER_SIZE}${element.poster_psth}` : './images/no_image.jpg'}
+                        movieId={element.id}
+                        movieName={element.original_title}
+                      />
+              })} 
+            </FourColGrid>
+         </div>
          <Spinner />
          <LoadMoreBtn />
        </div>
