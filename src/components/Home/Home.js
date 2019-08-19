@@ -49,9 +49,9 @@ class Home extends Component {
     if (this.state.searchTerm === '') {
       endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US&page=${this.state.currentPage + 1}`;
     } else {
-      endpoint = `${API_URL}movie/popular?api_key=${API_KEY}language=en-US&query=${this.state.searchTerm}$page=${this.state.currentPage + 1}`;
+      endpoint = `${API_URL}search/movie?api_key=${API_KEY}&language=en-US&query=${this.state.searchTerm}$page=${this.state.currentPage + 1}`;
     }
-    this.fetxhItems(endpoint);
+    this.fetchItems(endpoint);
   }
 
   fetchItems = (endpoint) => {
@@ -97,9 +97,11 @@ class Home extends Component {
                       />
               })} 
             </FourColGrid>
+            {this.state.loading ? <Spinner /> : null}
+            {(this.state.currentPage <= this.state.totalPage && !this.state.loading) ?
+              <LoadMoreBtn text="Load More" onClick={this.loadMoreItems} />
+              : null }
          </div>
-         <Spinner />
-         <LoadMoreBtn />
        </div>
      )
   }
