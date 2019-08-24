@@ -20,9 +20,14 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    this.setState({ loading: true });
-    const endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
-    this.fetchItems(endpoint); 
+    if (localStorage.getItem('HomeState')) {
+      const state = JSON.parse(localStorage.getItem('HomeState'));
+      this.setState({ ...state });
+    } else {
+      this.setState({ loading: true });
+      const endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
+      this.fetchItems(endpoint); 
+    }
   }
 
   searchItems = (searchTerm) => {
@@ -58,15 +63,19 @@ class Home extends Component {
     fetch(endpoint)
     .then(result => result.json())
     .then(result => {
-      // console.log(result);
       this.setState({ 
         movies: [...this.state.movies, ...result.results],
         heroImage: this.state.heroImage || result.results[0],
         loading: false,
         currentPage: result.page,
         totalPage: result.total_pages
+      },()  => {
+        if(this.state.searchTerm === ""){
+          localStorage.setItem('HomeState', JSON.stringify(this.state));
+        }
       }) 
-    });
+    })
+    .catch(error => console.error('Error:', error))
   }
 
   render() {
@@ -96,7 +105,7 @@ class Home extends Component {
                         movieName={element.original_title}
                       />
               })} 
-            </FourColGrid>
+            </FourColGrid> 
             {this.state.loading ? <Spinner /> : null}
             {(this.state.currentPage <= this.state.totalPage && !this.state.loading) ?
               <LoadMoreBtn text="Load More" onClick={this.loadMoreItems} />
