@@ -20,12 +20,12 @@ class Movie extends Component {
     const { movieId } = this.props.match.params;
 
     if (localStorage.getItem(`${ movieId }`)) {
-      let state = JSON.parse(localStorage.getItem(`${ movieId }`))
+      const state = JSON.parse(localStorage.getItem(`${ movieId }`))
       this.setState({ ...state })
     } else {
       this.setState({ loading: true })
     // First fetch the Movie ...
-    let endpoint = `${API_URL}movie/${ movieId }?api_key=${API_KEY}&language=en-US`;
+    const endpoint = `${API_URL}movie/${ movieId }?api_key=${API_KEY}&language=en-US`;
     this.fetchItems(endpoint);
     }
   }
