@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import FontAwesome from 'react-fontawesome';
 import './SearchBar.css';
 
@@ -10,11 +11,15 @@ class SearchBar extends Component {
   timeout = null;
 
   doSearch = (event) => {
+
+    // ES6 Destructing
+    const { callback } = this.props;
+    
     this.setState({ value: event.target.value })
     clearTimeout(this.timeout);
 
     this.timeout = setTimeout( () => {
-      this.props.callback(this.state.value);
+      callback(false, this.state.value);
     }, 500);
   }
 
@@ -34,6 +39,10 @@ class SearchBar extends Component {
       </div>
     )
   }
+}
+
+SearchBar.propTypes = {
+  callback: PropTypes.func
 }
 
 export default SearchBar;
