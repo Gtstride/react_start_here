@@ -1,128 +1,129 @@
-import React, { Component } from 'react';
-import { API_URL, API_KEY, IMAGE_BASE_URL, POSTER_SIZE, BACKDROP_SIZE } from '../../config';
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/no-array-index-key */
+import React, { useState, useEffect } from 'react';
+import {
+  API_URL,
+  API_KEY,
+  IMAGE_BASE_URL,
+  POSTER_SIZE,
+  BACKDROP_SIZE,
+} from '../../config';
 import HeroImage from '../elements/HeroImage/HeroImage';
 import SearchBar from '../elements/SearchBar/SearchBar';
 import FourColGrid from '../elements/FourColGrid/FourColGrid';
 import MovieThumb from '../elements/MovieThumb/MovieThumb';
-import LoadMoreBtn from '../elements/LoadMoreBtn/LoadMoreBtn'; 
+import LoadMoreBtn from '../elements/LoadMoreBtn/LoadMoreBtn';
 import Spinner from '../elements/Spinner/Spinner';
 import './Home.css';
-import { thisExpression } from '@babel/types';
 
-class Home extends Component {
-  state = {
-    movies: [],
-    heroImage: null,
-    loading: false,
-    currentPage: 0,
-    totalPage: 0,
-    searchTerm: ''
-  }
+const Home = () => {
+  const [state, setState] = useState({ movies: [] });
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
-  componentDidMount() {
-    if (sessionStorage.getItem('HomeState')) {
-      let state = JSON.parse(sessionStorage.getItem('HomeState'))
-      this.setState({ ...state })
-    } else {
-      this.setState({ loading: true })
-      const endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
-      this.fetchItems(endpoint);
+  const fetchMovies = async (endpoint) => {
+    setIsError(false);
+    setIsLoading(true);
+
+    // Use URLSearchParams to get URL. Very handy
+    const params = new URLSearchParams(endpoint);
+    if (!params.get('page')) {
+      setState((prev) => ({
+        ...prev,
+        movies: [],
+        searchTerm: params.get('query'),
+      }));
     }
-  }
 
-
-  createEndpoint = (type, loadMore, searchTerm) => {
-    return `${API_URL}${type}?api_key=${API_KEY}&language=en-US&page=${loadMore && this.state.currentPage + 1}&query=${ searchTerm }`;
-  }
-  
-  updateItems = (loadMore, searchTerm) => {
-   this.setState(
-     {
-       movies: loadMore ? [...this.state.movies] : [],
-       loading: true,
-       searchTerm: loadMore ? this.state.searchTerm : searchTerm,
-     }, () => {
-       this.fetchItems(
-         !this.state.searchTerm
-         ? this.createEndpoint("movie/popular", loadMore , "")
-         : this.createEndpoint("search/movie", loadMore, this.state.searchTerm)
-       )
-     }
-   )
-  }
-
-  loadMoreItems = () => {
-    let endpoint = '';
-    this.setState({ loading: true });
-    if (this.state.searchTerm === '') {
-      endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US&page=${this.state.currentPage + 1}`;
-    } else {
-      endpoint = `${API_URL}search/movie?api_key=${API_KEY}&language=en-US&query=${this.state.searchTerm}$page=${this.state.currentPage + 1}`;
+    try {
+      const result = await (await fetch(endpoint)).json();
+      setState((prev) => ({
+        ...prev,
+        movies: [...prev.movies, ...result.results],
+        heroImage: prev.heroImage || result.results[0],
+        currentPage: result.page,
+        totalPages: result.total_pages,
+      }));
+    } catch (error) {
+      setIsError(true);
     }
-    this.fetchItems(endpoint);
+    setIsLoading(false);
   };
 
-  fetchItems = async endpoint => {
-    const { movies, heroImage, searchTerm } = this.state;
-    const result = await ( await fetch(endpoint)).json();
-    try {
-      this.setState(
-        { 
-          movies: [...movies, ...result.results],
-          heroImage: heroImage || result.results[0],
-          loading: false,
-          currentPage: result.page,
-          totalPage: result.total_pages
-        },
-        ()  => {
-          if(searchTerm === "") {
-            sessionStorage.setItem('HomeState', JSON.stringify(this.state));
-          }
-        }
-      ); 
-    }
-    catch (e) {
-      console.log("An error occured: ", e);
-    }
-  }
+  // Run once on mount
+  useEffect(() => {
+    if(sessionStorage.getItem('HomeState')) {
+      const persistedState = JSON.parse(sessionStorage.getItem('HomeState'));
+      setState({ ...persistedState });
+    } else {
+      fetchMovies(`${API_URL}movie/popular?api_key=${API_KEY}`);
+    }  
+  }, []);
 
-  render() {
-    const { movies, heroImage, loading, currentPage, totalPage, searchTerm } = this.state;
-     return (
-       <div className="rmdb-home">
-         { heroImage ?  
-         <div>
-            <HeroImage 
-            image={`${IMAGE_BASE_URL}${BACKDROP_SIZE}${ heroImage.backdrop_path }`}
-            title={ heroImage.original_title }
-            text={ heroImage.overview }
+  // Remember state for the next mount if wwe are not in search view
+  useEffect(() => {
+    if(!state.searchTerm) {
+      sessionStorage.setItem('HomeState', JSON.stringify(state));
+    }
+  }, [state])
+
+  const searchItems = (searchTerm) => {
+    let endpoint = `${API_URL}search/movie?api_key=${API_KEY}&query=${searchTerm}`;
+    if (!searchTerm) {
+      endpoint = `${API_URL}movie/popular?api_key=${API_KEY}`;
+    }
+    fetchMovies(endpoint);
+  };
+
+  const loadMoreItems = () => {
+    // ES6 Destructuring the state
+    const { searchTerm, currentPage } = state;
+    let endpoint = `${API_URL}search/movie?api_key=${API_KEY}&query=${searchTerm}&page=${currentPage + 1}`;
+    // setState({ isLoading: true });
+    if (!searchTerm) {
+      endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&page=${currentPage + 1}`;
+    }
+    fetchMovies(endpoint);
+  };
+
+  return (
+    <div className="rmdb-home">
+      {state.heroImage && !state.searchTerm ? (
+        <div>
+          <HeroImage
+            image={`${IMAGE_BASE_URL}${BACKDROP_SIZE}${state.heroImage.backdrop_path}`}
+            title={state.heroImage.original_title}
+            text={state.heroImage.overview}
+          />
+        </div>
+      ) : null}
+      <SearchBar callback={searchItems} />
+      <div className="rmdb-home-grid">
+        <FourColGrid
+          header={state.searchTerm ? 'Search Result' : 'Popular Movies'}
+          loading={isLoading}
+        >
+          {state.movies.map((element, i) => (
+            <MovieThumb
+              key={i}
+              clickable={true}
+              image={
+                element.poster_path
+                  ? `${IMAGE_BASE_URL}${POSTER_SIZE}${element.poster_path}`
+                  : './images/no_image.jpg'
+              }
+              movieId={element.id}
+              movieName={element.original_title}
             />
-            <SearchBar callback={ this.updateItems } />
-         </div> : null }
-        
-         <div className="rmdb-home-grid">
-            <FourColGrid
-              header={ searchTerm ? 'Search Result' : 'Popular Movies'}
-              loading={ loading }
-            >
-              { movies.map ( (element, i) => {
-                return <MovieThumb
-                        key={1}
-                        clickable={ true }
-                        image={element.poster_path ? `${IMAGE_BASE_URL}${POSTER_SIZE}${element.poster_path}` : './images/no_image.jpg'}
-                        movieId={element.id}
-                        movieName={element.original_title}
-                      />
-              })} 
-            </FourColGrid> 
-            { loading ? <Spinner /> : null}
-            {( currentPage < totalPage && !loading) ?
-              <LoadMoreBtn text="Load More" onClick={this.updateItems} />
-              : null }
-         </div>
-       </div>
-     )
-  }
-}
+          ))}
+        </FourColGrid>
+        {isLoading ? <Spinner /> : null}
+        {state.currentPage <= state.totalPages && !isLoading ? (
+          <LoadMoreBtn text="Load More" onClick={loadMoreItems} />
+        ) : null}
+      </div>
+    </div>
+  );
+};
 
 export default Home;
