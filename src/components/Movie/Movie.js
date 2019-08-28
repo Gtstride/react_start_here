@@ -18,7 +18,6 @@ class Movie extends Component {
 
   componentDidMount() {
     const { movieId } = this.props.match.params;
-
     if (localStorage.getItem(`${ movieId }`)) {
       const state = JSON.parse(localStorage.getItem(`${ movieId }`))
       this.setState({ ...state })
@@ -35,7 +34,10 @@ class Movie extends Component {
     try {
       const result = await ( await fetch(endpoint)).json();
       if (result.status_code) {
-        this.setState({ loading: false });
+        // if no movie was found
+        this.setState({ loading: false }); 
+      } else {
+        this.setState({ movie: result });
         const creditsEndpoint = `${API_URL}movie/${ movieId }/credits?api_key=${API_KEY}`;
         const creditsResult = await ( await fetch(creditsEndpoint)).json();
         const directors = creditsResult.crew.filter( (member) => member.job === "Director");
@@ -47,8 +49,7 @@ class Movie extends Component {
           localStorage.setItem(`${ movieId }`, JSON.stringify(this.state));
         })
       }
-    } 
-    
+    }   
     catch (e) {
       console.log("An error occurred: ", e);
     }
