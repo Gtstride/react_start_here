@@ -23,17 +23,18 @@ React_start_here is a full movie listing site built with react, and react-hook.
 - Node JS
 - Express
 - React
--React-hook
+- React
 - ESLint
+- React-hook
 - Babel
 
 
 ## API Documentation
 
-[https://react-start-here.herokuapp.com/docs/](https://react-start-here-app1.herokuapp.com/docs/)
+[https://react-start-here.herokuapp.com/docs/](https://react-movie-app1.herokuapp.com/docs)
 
 The API is currently in version 1 (v1) and is hosted at
-[https://react-start-here-app1.herokuapp.com/](https://heroku.com/apps/react-movie-app1.herokuapp.com/)
+[https://react-start-here-app1.herokuapp.com/](https://react-movie-app1.herokuapp.com/)
 
 ## Author
 
