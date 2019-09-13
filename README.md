@@ -1,5 +1,5 @@
 # react_start_here
-Getting my hands dirty with a full movie sight with react
+React-app is a public movie platform show casing new, trending movies.
 
 <h2>Getting Started with React App</h2>
 
