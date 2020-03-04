@@ -1,5 +1,9 @@
 # react_start_here
+<<<<<<< HEAD
 React-app is a public movie platform show casing new, trending movies.
+=======
+React_start_here is a full movie listing site built with react, and react-hook.
+>>>>>>> 460c218c5711c3eaaac5573bd390c821bc125b91
 
 <h2>Getting Started with React App</h2>
 
@@ -16,3 +20,26 @@ React-app is a public movie platform show casing new, trending movies.
   </tr>
 </ul>
 </table>
+
+
+## Technologies
+
+- Node JS
+- Express
+- React
+- React
+- ESLint
+- React-hook
+- Babel
+
+
+## API Documentation
+
+[https://react-start-here.herokuapp.com/docs/](https://react-movie-app1.herokuapp.com/docs)
+
+The API is currently in version 1 (v1) and is hosted at
+[https://react-start-here-app1.herokuapp.com/](https://react-movie-app1.herokuapp.com/)
+
+## Author
+
+Agho Godstime Omorogbe
